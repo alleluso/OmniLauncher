@@ -1,0 +1,183 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OmniLauncher.ViewModels"
+             xmlns:svg="using:Avalonia.Svg.Skia"
+             Classes="dialog" x:Class="OmniLauncher.Views.SettingsView" x:DataType="vm:SettingsViewModel">
+    <UserControl.Styles>
+        <Style Selector="Border.install-row">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="{StaticResource PanelRadius}"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        <Style Selector="Border.install-row.drop-target"><Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/></Style>
+        <Style Selector="Border.install-row.drag-source"><Setter Property="Opacity" Value="0.45"/></Style>
+        <Style Selector="Border.drag-grip:pointerover"><Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/></Style>
+    </UserControl.Styles>
+    <ThemeVariantScope RequestedThemeVariant="Dark">
+        <Border Classes="dialog-shell" MaxWidth="1000" Margin="50">
+            <Grid RowDefinitions="*,Auto">
+                <ScrollViewer x:Name="ApplicationScroll" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        
+                        <!-- Applications section: heading and add button, count and hint, then application rows. -->
+                        <StackPanel Classes="dialog-heading">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Applications" Classes="dialog-title" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="Add Application" Classes="dialog-action" HorizontalAlignment="Right" Command="{Binding AddCommand}" CommandParameter="{Binding $parent[Window]}"/>
+                            </Grid>
+                            <TextBlock Text="Manage the applications used to open your projects." Classes="dialog-description"/>
+                        </StackPanel>
+                        <Grid Margin="24,0,24,12" RowDefinitions="Auto,Auto" RowSpacing="12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                <TextBlock Text="{Binding CountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+                                <TextBlock Grid.Column="1" Text="Drag to reorder · First match takes priority" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" HorizontalAlignment="Right" TextWrapping="Wrap"/>
+                            </Grid>
+                            <StackPanel Grid.Row="1">
+                                <Border IsVisible="{Binding IsEmpty}" Classes="dialog-card" Padding="24" Margin="0,0,0,12">
+                                    <TextBlock Text="No application yet. Add an executable to get started." Classes="dialog-description"/>
+                                </Border>
+                                <ItemsControl x:Name="ApplicationList" ItemsSource="{Binding Applications}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:RegisteredApplicationViewModel">
+                                            <Border Classes="install-row">
+                                                <Grid ColumnDefinitions="24,42,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12">
+                                                    <Border Classes="drag-grip" VerticalAlignment="Center" Width="24" Padding="0,8" CornerRadius="{StaticResource ControlRadius}"
+                                                            Cursor="SizeAll" AutomationProperties.Name="Reorder application"
+                                                            ToolTip.Tip="Drag to reorder."
+                                                            PointerPressed="OnGripPressed" PointerMoved="OnGripMoved" PointerReleased="OnGripReleased"
+                                                            PointerCaptureLost="OnGripCaptureLost">
+                                                        <Path Classes="utility-icon" HorizontalAlignment="Center" Data="M8,4 H8.01 M16,4 H16.01 M8,12 H8.01 M16,12 H16.01 M8,20 H8.01 M16,20 H16.01" StrokeThickness="3"/>
+                                                    </Border>
+                                                    <Border Grid.Column="1" Background="#1E1E23" CornerRadius="{StaticResource PanelRadius}" Width="42" Height="42" VerticalAlignment="Center">
+                                                        <svg:Svg Path="{Binding IconPath}" Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <Grid Grid.Column="2" RowDefinitions="Auto,Auto" RowSpacing="4" VerticalAlignment="Center">
+                                                        <WrapPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="{StaticResource ItemTitleFontSize}" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,12,0"/>
+                                                            <TextBlock Text="{Binding VersionLabel}" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                                        </WrapPanel>
+                                                        <TextBlock Grid.Row="1" Text="{Binding Path}" TextTrimming="CharacterEllipsis" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}" ToolTip.Tip="{Binding Path}"/>
+                                                    </Grid>
+                                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                        <Button Content="Browse" Classes="dialog-action" Command="{Binding BrowseCommand}" CommandParameter="{Binding $parent[Window]}"/>
+                                                        <Button Content="Remove" Classes="dialog-action dialog-danger" Command="{Binding RemoveCommand}"/>
+                                                    </StackPanel>
+                                                    <Border Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" IsVisible="{Binding IsMissing}" Background="{DynamicResource WarningSurfaceBrush}" CornerRadius="{StaticResource ControlRadius}" Padding="12,8" Margin="0,8,0,0">
+                                                        <TextBlock Text="Application not found. Browse to locate the executable." Foreground="{DynamicResource WarningTextBrush}" FontSize="{StaticResource MetadataFontSize}" TextWrapping="Wrap"/>
+                                                    </Border>
+                                                    <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding Error}" Foreground="{DynamicResource ErrorTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Categories section: heading and add button, count and hint, then editable category rows. -->
+                        <StackPanel Classes="dialog-heading">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Categories" Classes="dialog-title" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="Add Category" Classes="dialog-action" HorizontalAlignment="Right" Command="{Binding AddCategoryCommand}"/>
+                            </Grid>
+                            <TextBlock Text="Organize your projects with names and colors." Classes="dialog-description"/>
+                        </StackPanel>
+                        <Grid Margin="24,0,24,12" RowDefinitions="Auto,Auto" RowSpacing="12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                <TextBlock Text="{Binding CategoryCountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+                                <TextBlock Grid.Column="1" Text="Drag to reorder · Deleting a category leaves its projects uncategorized" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" HorizontalAlignment="Right" TextWrapping="Wrap"/>
+                            </Grid>
+                            <StackPanel Grid.Row="1">
+                                <Border IsVisible="{Binding HasNoCategories}" Classes="dialog-card" Padding="24" Margin="0,0,0,12">
+                                    <TextBlock Text="No categories yet. Add a category to organize your projects." Classes="dialog-description"/>
+                                </Border>
+                                <ItemsControl x:Name="CategoryList" ItemsSource="{Binding Categories}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:CategorySettingsViewModel">
+                                            <Border Classes="install-row">
+                                                <Grid ColumnDefinitions="24,*,42,Auto,Auto" ColumnSpacing="12">
+                                                    <Border Classes="drag-grip" VerticalAlignment="Center" Width="24" Padding="0,8" CornerRadius="{StaticResource ControlRadius}"
+                                                            Cursor="SizeAll" AutomationProperties.Name="Reorder category"
+                                                            ToolTip.Tip="Drag to reorder."
+                                                            PointerPressed="OnGripPressed" PointerMoved="OnGripMoved" PointerReleased="OnGripReleased"
+                                                            PointerCaptureLost="OnGripCaptureLost">
+                                                        <Path Classes="utility-icon" HorizontalAlignment="Center" Data="M8,4 H8.01 M16,4 H16.01 M8,12 H8.01 M16,12 H16.01 M8,20 H8.01 M16,20 H16.01" StrokeThickness="3"/>
+                                                    </Border>
+                                                    <TextBox Grid.Column="1" Text="{Binding Name, Mode=TwoWay}" Classes="dialog-input" VerticalAlignment="Center"
+                                                             PlaceholderText="Category name" AutomationProperties.Name="Category name"/>
+                                                    <Button Grid.Column="2" Width="36" Height="36" Padding="0" CornerRadius="18" VerticalAlignment="Center"
+                                                            Background="{Binding ColorBrush}" BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="1"
+                                                            ToolTip.Tip="Edit category color" AutomationProperties.Name="Edit category color">
+                                                        <Button.Flyout>
+                                                            <Flyout>
+                                                                <StackPanel Width="240" Spacing="8">
+                                                                    <TextBlock Text="Category color" FontWeight="SemiBold"/>
+                                                                    <Border Background="{Binding ColorBrush}" Height="36" CornerRadius="{StaticResource ControlRadius}"/>
+                                                                    <TextBlock Text="{Binding Hue, StringFormat='Hue: {0:0}°'}"/>
+                                                                    <Slider Minimum="0" Maximum="360" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Hue, Mode=TwoWay}" AutomationProperties.Name="Hue"/>
+                                                                    <TextBlock Text="{Binding Saturation, StringFormat='Saturation: {0:0}%'}"/>
+                                                                    <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Saturation, Mode=TwoWay}" AutomationProperties.Name="Saturation"/>
+                                                                    <TextBlock Text="{Binding Value, StringFormat='Value: {0:0}%'}"/>
+                                                                    <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Value, Mode=TwoWay}" AutomationProperties.Name="Value"/>
+                                                                    <TextBox Text="{Binding ColorHex, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="Hex color"/>
+                                                                    <TextBlock Text="Use a color such as #AA88DE." IsVisible="{Binding HasColorError}" Foreground="{DynamicResource ErrorTextBrush}"/>
+                                                                </StackPanel>
+                                                            </Flyout>
+                                                        </Button.Flyout>
+                                                    </Button>
+                                                    <TextBlock Grid.Column="3" Text="{Binding UsageLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center" MinWidth="70"/>
+                                                    <Button Grid.Column="4" Content="Delete" Classes="dialog-action dialog-danger" Command="{Binding RemoveCommand}"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Git section -->
+                        <StackPanel Classes="dialog-heading">
+                            <TextBlock Text="Source control" Classes="dialog-title"/>
+                            <TextBlock Text="Choose a Git client or terminal to automatically show Git status for your projects." Classes="dialog-description"/>
+                        </StackPanel>
+                        <StackPanel Margin="24,0,24,24" Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                <TextBox Classes="dialog-input" Text="{Binding SourceControlApplication}" PlaceholderText="Git Client or Terminal executable"/>
+                                <Button Grid.Column="1" Content="Browse" Classes="dialog-action" Command="{Binding BrowseSourceControlCommand}" CommandParameter="{Binding $parent[Window]}"/>
+                                <Button Grid.Column="2" Content="Remove" Classes="dialog-action dialog-danger" Command="{Binding ClearSourceControlCommand}"/>
+                            </Grid>
+                            <Expander Classes="dialog-card" Header="Advanced launch settings" HorizontalAlignment="Stretch">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Launch arguments (optional, one argument per line)" Classes="dialog-label"/>
+                                    <TextBox Classes="dialog-input" Text="{Binding SourceControlArguments}" AcceptsReturn="True" MinHeight="80" VerticalContentAlignment="Top"/>
+                                    <TextBlock Text="Use {repository} for the repository path, without quotes. Custom arguments replace the defaults. By default, Git clients receive the path; Windows Terminal and Git Bash receive their directory option." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock Text="Git executable used to read status" Classes="dialog-label"/>
+                                    <TextBox Classes="dialog-input" Text="{Binding GitExecutable}" PlaceholderText="git"/>
+                                    <TextBlock Text="Requires Git on PATH, or the full path to git.exe. Status is local; the application does not fetch from remotes." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+                <!-- Shared footer: validation messages and settings save/cancel actions. -->
+                <Border Grid.Row="1" Classes="dialog-footer">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding Error}" Foreground="{DynamicResource ErrorTextBrush}" TextWrapping="Wrap" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <TextBlock Text="Changes apply when you save." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button Content="Cancel" Classes="dialog-action" Command="{Binding CancelCommand}"/>
+                                <Button Content="Save settings" Classes="dialog-action dialog-primary" Command="{Binding SaveCommand}"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ThemeVariantScope>
+</UserControl>
+

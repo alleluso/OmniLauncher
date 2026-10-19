@@ -1,0 +1,78 @@
+<controls:ProjectCard xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:OmniLauncher.Controls" xmlns:m="using:OmniLauncher.Models"
+             xmlns:conv="using:OmniLauncher.Converters"
+             xmlns:svg="using:Avalonia.Svg.Skia"
+             x:Class="OmniLauncher.Controls.ProjectListItem" x:DataType="m:ProjectItem"
+             HorizontalAlignment="Stretch" MinHeight="84">
+    <Grid Classes="project-card">
+        <Border CornerRadius="9" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" ClipToBounds="True">
+            <Grid x:Name="ListLayout" ColumnDefinitions="*,Auto,Auto">
+                <Button x:Name="OpenButton" Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding LaunchStatus}" AutomationProperties.Name="{Binding Name}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Grid x:Name="Cover" Grid.ColumnSpan="2" Width="220" Height="82" VerticalAlignment="Center" ClipToBounds="True" HorizontalAlignment="Left" IsHitTestVisible="False">
+                            <Grid.OpacityMask>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                    <GradientStop Offset="0" Color="White"/>
+                                    <GradientStop Offset="0.45" Color="White"/>
+                                    <GradientStop Offset="1" Color="Transparent"/>
+                                </LinearGradientBrush>
+                            </Grid.OpacityMask>
+                            <Border Background="#302D40"/>
+                            <svg:Svg Path="{Binding ApplicationType, Converter={x:Static conv:ProjectTypeToIconConverter.Instance}}"
+                                     IsVisible="{Binding #ListCoverImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
+                                     Width="46" Height="46" Opacity="0.65"/>
+                            <Image x:Name="ListCoverImage" Source="{Binding DisplayImagePath, Converter={x:Static conv:PathToImageConverter.Instance}}" Stretch="UniformToFill"/>
+                        </Grid>
+                        <StackPanel x:Name="TitlePanel" Margin="250,0,16,0" VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource ItemTitleFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"/>
+                            <TextBlock Text="{Binding ApplicationName}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </Grid>
+                </Button>
+                <StackPanel x:Name="Metadata" Grid.Column="1" VerticalAlignment="Center" Margin="0,12,16,12" Spacing="4" MaxWidth="380">
+                    <TextBlock x:Name="LastOpened" Text="{Binding LastOpenedLabel}" ToolTip.Tip="{Binding LastOpenedLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"
+                               HorizontalAlignment="Right" TextAlignment="Right" TextWrapping="Wrap"/>
+                    <Button x:Name="GitStatus" Classes="git-text" IsVisible="{Binding HasGitStatus}" Click="OnSourceControl"
+                            HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+                            ToolTip.Tip="{Binding GitBadge}" AutomationProperties.Name="Source control status">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                            <Path Width="12" Height="14" Stretch="Uniform" Stroke="{Binding GitColor}" StrokeThickness="1.5"
+                                  VerticalAlignment="Center" Data="M 4,5 L 4,13 M 4,11 C 4,8 12,10 12,5 M 4,1 A 2,2 0 1,0 4,5 A 2,2 0 1,0 4,1 M 4,13 A 2,2 0 1,0 4,17 A 2,2 0 1,0 4,13 M 12,1 A 2,2 0 1,0 12,5 A 2,2 0 1,0 12,1"/>
+                        <TextBlock x:Name="GitLabel" Grid.Column="1" Text="{Binding GitBadge}" Foreground="{Binding GitColor}" FontSize="{StaticResource MetadataFontSize}"
+                                   TextAlignment="Right" TextWrapping="Wrap"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+                <StackPanel x:Name="Actions" Grid.Column="2" Margin="0,0,16,0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="{Binding RepairLabel}" Classes="repair-action" IsVisible="{Binding NeedsRepair}" Click="OnOpen" ToolTip.Tip="{Binding LaunchStatus}"/>
+                    <Panel x:Name="CompactGitStatus" IsVisible="False">
+                        <Button Classes="tile-icon" IsVisible="{Binding HasGitStatus}" Click="OnSourceControl"
+                                ToolTip.Tip="{Binding GitBadge}" AutomationProperties.Name="Source control status">
+                            <Path Width="16" Height="18" Stretch="Uniform" Stroke="{Binding GitColor}" StrokeThickness="1.5"
+                                  Data="M 4,5 L 4,13 M 4,11 C 4,8 12,10 12,5 M 4,1 A 2,2 0 1,0 4,5 A 2,2 0 1,0 4,1 M 4,13 A 2,2 0 1,0 4,17 A 2,2 0 1,0 4,13 M 12,1 A 2,2 0 1,0 12,5 A 2,2 0 1,0 12,1"/>
+                        </Button>
+                    </Panel>
+                    <Button Classes="tile-icon" IsVisible="{Binding HasNotes}" Click="OnNotes"
+                            ToolTip.Tip="Notes and Links" AutomationProperties.Name="Notes and Links">
+                        <Path Width="18" Height="18" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5"
+                              Data="M 4,2 L 14,2 L 20,8 L 20,22 L 4,22 Z M 14,2 L 14,8 L 20,8 M 8,12 L 16,12 M 8,16 L 16,16"/>
+                    </Button>
+                    <Button Classes="tile-icon" Classes.favorite="{Binding IsFavorite}" Click="OnFavorite"
+                            ToolTip.Tip="{Binding FavoriteLabel}" AutomationProperties.Name="{Binding FavoriteLabel}">
+                        <Path Classes="favorite-star" Width="18" Height="18" Stretch="Uniform" Data="M12,2 L15,8.5 L22,9.5 L17,14.5 L18.2,22 L12,18.5 L5.8,22 L7,14.5 L2,9.5 L9,8.5 Z"/>
+                    </Button>
+                    <Button Classes="tile-icon" Click="OnMenu" ToolTip.Tip="Project actions" AutomationProperties.Name="Project actions">
+                        <PathIcon Width="18" Height="4" Data="M2,0 A2,2 0 1,0 2,4 A2,2 0 1,0 2,0 M9,0 A2,2 0 1,0 9,4 A2,2 0 1,0 9,0 M16,0 A2,2 0 1,0 16,4 A2,2 0 1,0 16,0"/>
+                    </Button>
+                </StackPanel>
+                <Border Grid.ColumnSpan="3" Background="{Binding Category.Color}" IsVisible="{Binding HasCategory}"
+                        Width="9" HorizontalAlignment="Right" ToolTip.Tip="{Binding Category.Name}"
+                        AutomationProperties.Name="{Binding Category.Name}"/>
+            </Grid>
+        </Border>
+        <Border Classes="project-outline" CornerRadius="{StaticResource PanelRadius}" BorderThickness="1" IsHitTestVisible="False"/>
+    </Grid>
+</controls:ProjectCard>
+

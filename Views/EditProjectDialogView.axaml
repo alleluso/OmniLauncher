@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OmniLauncher.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="380"
+             Classes="dialog" x:Class="OmniLauncher.Views.EditProjectDialogView"
+             x:DataType="vm:EditProjectDialogViewModel">
+
+    <Design.DataContext>
+        <vm:EditProjectDialogViewModel/>
+    </Design.DataContext>
+
+    <ThemeVariantScope RequestedThemeVariant="Dark">
+        <Border Classes="dialog-shell" MaxWidth="580" MaxHeight="760" Margin="24"
+                VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Classes="dialog-heading">
+                    <TextBlock Text="Edit project" Classes="dialog-title"/>
+                    <TextBlock Text="Update project details, cover image, and application preferences." Classes="dialog-description"/>
+
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="24,0,24,24" Spacing="16">
+                        <!-- Name -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Project name" Classes="dialog-label"/>
+                            <TextBox Classes="dialog-input" Text="{Binding ProjectName}" PlaceholderText="My Project"/>
+                        </StackPanel>
+            
+                        <!-- Project folder -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="{Binding PathLoader.ProjectPathLabel}" Classes="dialog-label"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Classes="dialog-input" Grid.Column="0" Text="{Binding ProjectPath}"
+                                         PlaceholderText="{Binding PathLoader.ProjectPathPlaceholder}"/>
+                                <Grid Grid.Column="1">
+                                    <Button Classes="dialog-action" Content="Browse" IsVisible="{Binding !HasPathChoices}"
+                                            Command="{Binding BrowsePathCommand}"
+                                            CommandParameter="{Binding $parent[Window]}"/>
+                                    <Button Classes="dialog-action" Content="Browse ▾" IsVisible="{Binding HasPathChoices}">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuItem Header="{Binding PathLoader.FolderPickerTitle}" Click="OnBrowseFolder"/>
+                                                <MenuItem Header="{Binding PathLoader.FilePickerTitle}" Click="OnBrowseFile"/>
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+        
+
+                        <!-- Cover image (optional) -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Cover image (optional)" Classes="dialog-label"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Classes="dialog-input" Grid.Column="0" Text="{Binding ImagePath}"
+                                         PlaceholderText="Select an image or leave empty…"/>
+                                <Button Classes="dialog-action" Grid.Column="1" Content="Browse"
+                                        Command="{Binding BrowseImageCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"/>
+                            </Grid>
+                        </StackPanel>
+            
+                        <!-- Override -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Application override (optional)" Classes="dialog-label"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Classes="dialog-input" Grid.Column="0" Text="{Binding ExecutableOverride}"
+                                         PlaceholderText="Select an application or leave empty…"/>
+                                <Button Classes="dialog-action" Grid.Column="1" Content="Browse"
+                                        Command="{Binding BrowseExecutableCommand}"
+                                        CommandParameter="{Binding $parent[Window]}"/>
+                            </Grid>
+                            <TextBlock Text="{Binding ApplicationError}" Classes="dialog-error" IsVisible="{Binding ApplicationError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding PathError}" Classes="dialog-error" IsVisible="{Binding PathError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+    
+                        <!-- Shortcut -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Launch shortcut (optional)" Classes="dialog-label"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Border x:Name="ShortcutRecorder" Classes="shortcut-recorder"
+                                        Focusable="True" LostFocus="OnRecorderLostFocus"
+                                        AutomationProperties.Name="Launch shortcut">
+                                    <Grid VerticalAlignment="Center">
+                                        <TextBlock Text="No shortcut" Foreground="{DynamicResource TextControlPlaceholderForeground}"
+                                                   IsVisible="{Binding ShortcutDisplayText, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                                        <TextBlock Classes="shortcut-value" Classes.recording="{Binding IsRecordingShortcut}"
+                                                   Text="{Binding ShortcutDisplayText}"/>
+                                    </Grid>
+                                </Border>
+                                <Button x:Name="ShortcutAction" Grid.Column="1" Classes="dialog-action"
+                                        Classes.dialog-danger="{Binding IsShortcutActionDanger}"
+                                        Content="{Binding ShortcutButtonLabel}" Click="OnRecordShortcut"/>
+                            </Grid>
+                            <TextBlock Text="{Binding ShortcutError}" Classes="dialog-error" IsVisible="{Binding ShortcutError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            <TextBlock Text="Shortcuts are global. This overrides the combination in other applications (for example, Ctrl+A normally selects all)." Classes="dialog-description" FontSize="{StaticResource MetadataFontSize}" Foreground="#FFED86" />
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+                <Border Grid.Row="2" Classes="dialog-footer">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="Cancel" Classes="dialog-action" Command="{Binding CancelCommand}"/>
+                        <Button Content="Save changes" Classes="dialog-action dialog-primary" Command="{Binding ConfirmCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ThemeVariantScope>
+</UserControl>
+

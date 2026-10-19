@@ -1,0 +1,62 @@
+name: Windows release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Validate release version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^v(\d+\.\d+\.\d+)$') {
+            throw 'Release tags must use vMAJOR.MINOR.PATCH, for example v0.1.0.'
+          }
+          $version = $Matches[1]
+          [xml]$project = Get-Content OmniLauncher.csproj
+          if ($project.Project.PropertyGroup.Version -ne $version) {
+            throw "Tag version $version must match Version in OmniLauncher.csproj."
+          }
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+      - name: Publish self-contained Windows executable
+        run: >-
+          dotnet publish OmniLauncher.csproj -c Release -r win-x64
+          --self-contained true -p:PublishSingleFile=true
+          -p:EnableCompressionInSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None
+          -p:ContinuousIntegrationBuild=true -o publish
+      - name: Prepare release assets
+        run: |
+          $executable = 'publish/OmniLauncher.exe'
+          if (-not (Test-Path -LiteralPath $executable -PathType Leaf)) {
+            throw 'Publish did not produce OmniLauncher.exe.'
+          }
+          Copy-Item LICENSE publish/LICENSE.txt
+          $hash = (Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  OmniLauncher.exe" | Set-Content publish/SHA256SUMS.txt -Encoding utf8
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$env:RELEASE_TAG" publish/OmniLauncher.exe publish/LICENSE.txt publish/SHA256SUMS.txt --verify-tag --title "OmniLauncher $env:RELEASE_VERSION" --generate-notes --notes "Windows x64 portable application. Download and run OmniLauncher.exe; no separate .NET installation is required."
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release creation failed.' }

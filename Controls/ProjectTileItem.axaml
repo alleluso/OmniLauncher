@@ -1,0 +1,87 @@
+<controls:ProjectCard xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:OmniLauncher.Controls" xmlns:m="using:OmniLauncher.Models"
+             xmlns:conv="using:OmniLauncher.Converters"
+             xmlns:svg="using:Avalonia.Svg.Skia"
+             x:Class="OmniLauncher.Controls.ProjectTileItem" x:DataType="m:ProjectItem"
+             HorizontalAlignment="Stretch">
+    <controls:ProjectCard.Styles>
+        <Style Selector="Grid.compact-tile Grid.tile-footer">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="StackPanel.tile-actions">
+            <Setter Property="Spacing" Value="4"/>
+        </Style>
+        <Style Selector="Grid.compact-tile StackPanel.tile-actions">
+            <Setter Property="Spacing" Value="4"/>
+        </Style>
+    </controls:ProjectCard.Styles>
+    <Grid x:Name="TileLayout" Classes="project-card">
+        <Border CornerRadius="9" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" ClipToBounds="True">
+            <Grid x:Name="TileContent" RowDefinitions="174,*">
+                <Button Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding LaunchStatus}" AutomationProperties.Name="{Binding Name}">
+                    <Grid>
+                        <Border Background="#302D40"/>
+                        <svg:Svg Path="{Binding ApplicationType, Converter={x:Static conv:ProjectTypeToIconConverter.Instance}}"
+                                 IsVisible="{Binding #CoverImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
+                                 Width="46" Height="46" Opacity="0.45" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,24"/>
+                        <Image x:Name="CoverImage" Source="{Binding DisplayImagePath, Converter={x:Static conv:PathToImageConverter.Instance}}" Stretch="UniformToFill"/>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                    <GradientStop Offset="0" Color="#18000000"/>
+                                    <GradientStop Offset="0.45" Color="#10000000"/>
+                                    <GradientStop Offset="1" Color="#EF17171C"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </Grid>
+                </Button>
+                <StackPanel Classes="tile-actions" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                <Button Classes="tile-icon" Classes.favorite="{Binding IsFavorite}" Click="OnFavorite"
+                        ToolTip.Tip="{Binding FavoriteLabel}" AutomationProperties.Name="{Binding FavoriteLabel}">
+                    <Path Classes="favorite-star" Width="18" Height="18" Stretch="Uniform" Data="M12,2 L15,8.5 L22,9.5 L17,14.5 L18.2,22 L12,18.5 L5.8,22 L7,14.5 L2,9.5 L9,8.5 Z"/>
+                </Button>
+                    <Button Classes="tile-icon" IsVisible="{Binding HasGitStatus}" Click="OnSourceControl"
+                            ToolTip.Tip="{Binding GitBadge}" AutomationProperties.Name="Source control status">
+                        <Path Width="16" Height="18" Stretch="Uniform" Stroke="{Binding GitColor}" StrokeThickness="1.5"
+                              Data="M 4,5 L 4,13 M 4,11 C 4,8 12,10 12,5 M 4,1 A 2,2 0 1,0 4,5 A 2,2 0 1,0 4,1 M 4,13 A 2,2 0 1,0 4,17 A 2,2 0 1,0 4,13 M 12,1 A 2,2 0 1,0 12,5 A 2,2 0 1,0 12,1"/>
+                    </Button>
+                    <Button Classes="tile-icon" IsVisible="{Binding HasNotes}" Click="OnNotes"
+                            ToolTip.Tip="Notes and Links" AutomationProperties.Name="Notes and Links">
+                        <Path Width="18" Height="18" Stretch="Uniform" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="1.5"
+                              Data="M 4,2 L 14,2 L 20,8 L 20,22 L 4,22 Z M 14,2 L 14,8 L 20,8 M 8,12 L 16,12 M 8,16 L 16,16"/>
+                    </Button>
+                </StackPanel>
+                <Button x:Name="MenuButton" Classes="tile-icon" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Margin="8" Click="OnMenu" ToolTip.Tip="Project actions" AutomationProperties.Name="Project actions">
+                    <PathIcon Width="18" Height="4" Data="M2,0 A2,2 0 1,0 2,4 A2,2 0 1,0 2,0 M9,0 A2,2 0 1,0 9,4 A2,2 0 1,0 9,0 M16,0 A2,2 0 1,0 16,4 A2,2 0 1,0 16,0"/>
+                </Button>
+                <StackPanel VerticalAlignment="Bottom" Margin="16,0,16,12" Spacing="4">
+                    <Button Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding Name}">
+                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource ItemTitleFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Button>
+
+                </StackPanel>
+                <Grid Classes="tile-footer" Grid.Row="1" Margin="16,12" RowDefinitions="Auto,*">
+                    <TextBlock Text="{Binding ApplicationName}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" TextTrimming="CharacterEllipsis"/>
+                    <Panel x:Name="LastOpenedContainer" Grid.Row="1">
+                        <TextBlock Text="{Binding LastOpenedLabel}" IsVisible="{Binding CanLaunch}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    </Panel>
+                    <Grid Grid.Row="1" IsVisible="{Binding NeedsRepair}" ColumnDefinitions="*,Auto" ColumnSpacing="4">
+                        <TextBlock Text="{Binding AvailabilityLabel}" Foreground="{DynamicResource WarningTextBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding LaunchStatus}"/>
+                        <Button Grid.Column="1" Classes="repair-action" Content="{Binding RepairLabel}" Click="OnOpen"/>
+                    </Grid>
+                </Grid>
+                <Border Grid.RowSpan="2" Background="{Binding Category.Color}" IsVisible="{Binding HasCategory}"
+                        Height="9" VerticalAlignment="Bottom" ToolTip.Tip="{Binding Category.Name}"
+                        AutomationProperties.Name="{Binding Category.Name}"/>
+            </Grid>
+        </Border>
+        <!-- Draw the outline last so the cover and its clipping cannot paint over it. -->
+        <Border Classes="project-outline" CornerRadius="{StaticResource PanelRadius}" BorderThickness="1" IsHitTestVisible="False"/>
+    </Grid>
+</controls:ProjectCard>

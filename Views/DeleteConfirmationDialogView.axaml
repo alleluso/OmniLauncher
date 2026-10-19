@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OmniLauncher.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="220"
+             Classes="dialog" x:Class="OmniLauncher.Views.DeleteConfirmationDialogView"
+             x:DataType="vm:DeleteConfirmationDialogViewModel">
+
+    <Design.DataContext>
+        <vm:DeleteConfirmationDialogViewModel/>
+    </Design.DataContext>
+
+    <ThemeVariantScope RequestedThemeVariant="Dark">
+        <Border Classes="dialog-shell" MaxWidth="480" Margin="24"
+                VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Classes="dialog-heading">
+                    <TextBlock Text="{Binding Title}" Classes="dialog-title"/>
+                    <TextBlock Text="{Binding Description}" Classes="dialog-description"/>
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="24,0,24,24" Spacing="16">
+                        <Border Classes="dialog-card">
+                            <TextBlock Text="{Binding ProjectName}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{StaticResource ItemTitleFontSize}"
+                                       FontWeight="SemiBold" TextWrapping="Wrap"/>
+                        </Border>
+                        <TextBlock Text="{Binding PreservationMessage}" Classes="dialog-description"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <Border Grid.Row="2" Classes="dialog-footer">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="Cancel" Classes="dialog-action" Command="{Binding CancelCommand}"/>
+                        <Button Content="{Binding Title}" Classes="dialog-action dialog-danger" Command="{Binding ConfirmCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ThemeVariantScope>
+</UserControl>

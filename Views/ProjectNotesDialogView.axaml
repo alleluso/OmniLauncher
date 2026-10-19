@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OmniLauncher.ViewModels"
+             xmlns:controls="using:OmniLauncher.Controls"
+             Classes="dialog" x:Class="OmniLauncher.Views.ProjectNotesDialogView"
+             x:DataType="vm:ProjectNotesDialogViewModel">
+    <UserControl.Styles>
+        <Style Selector="TabStrip.notes-tabs TabStripItem">
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+    <ThemeVariantScope RequestedThemeVariant="Dark">
+        <Border Classes="dialog-shell" MaxWidth="1000" Margin="50">
+            <Grid RowDefinitions="*,Auto">
+                <ScrollViewer x:Name="LinkScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <StackPanel Classes="dialog-heading">
+                            <TextBlock Text="{Binding Title}" Classes="dialog-title"/>
+                            <TextBlock Text="Add reminders, setup instructions, or notes about where you left off." Classes="dialog-description"/>
+                        </StackPanel>
+                        <StackPanel Margin="24,0,24,12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Margin="0,0,0,12">
+                                <TabStrip Classes="notes-tabs" MinHeight="0" SelectedIndex="{Binding NotesTabIndex, Mode=TwoWay}">
+                                    <TabStripItem><TextBlock Text="Edit" FontSize="{StaticResource BodyFontSize}"/></TabStripItem>
+                                    <TabStripItem><TextBlock Text="Preview" FontSize="{StaticResource BodyFontSize}"/></TabStripItem>
+                                </TabStrip>
+                                <TextBlock Grid.Column="1" Text="Markdown supported: # heading · **bold** · *italic* · - list · - [ ] task · `code`"
+                                           Classes="dialog-label" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                           TextAlignment="Right" TextWrapping="Wrap"/>
+                            </Grid>
+                                    <TextBox Classes="dialog-input project-notes" Text="{Binding Notes}" AcceptsReturn="True"
+                                             IsVisible="{Binding IsEditingNotes}"
+                                             TextWrapping="Wrap" MinHeight="200" MaxHeight="450" VerticalContentAlignment="Top"
+                                             PlaceholderText=""
+                                             AutomationProperties.Name="Project notes"/>
+                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderControlBrush}" BorderThickness="1" CornerRadius="{StaticResource ControlRadius}"
+                                            IsVisible="{Binding !IsEditingNotes}"
+                                            Padding="16" MinHeight="200" MaxHeight="450" ClipToBounds="True"
+                                            TextElement.Foreground="{DynamicResource TextPrimaryBrush}" TextElement.FontSize="{StaticResource ItemTitleFontSize}">
+                                        <Grid>
+                                            <TextBlock Text="Nothing to preview yet. Add a note in Edit." Classes="dialog-description"
+                                                       IsVisible="{Binding !HasNotes}"/>
+                                            <controls:NotesMarkdownPreview SourceMarkdown="{Binding PreviewMarkdown}"
+                                                                           ToggleTaskCommand="{Binding ToggleNoteTaskCommand}"
+                                                                           OpenLinkCommand="{Binding OpenNoteLinkCommand}"
+                                                                           MarkdownStyleName="FluentTheme" SelectionEnabled="True"
+                                                                           IsVisible="{Binding HasNotes}"
+                                                                           AutomationProperties.Name="Notes Markdown preview"/>
+                                        </Grid>
+                                    </Border>
+                        </StackPanel>
+                        <StackPanel Classes="dialog-heading">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                <TextBlock Text="Links" Classes="dialog-title" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="Add Link" Classes="dialog-action" Command="{Binding AddLinkCommand}"/>
+                            </Grid>
+                            <TextBlock Text="Save useful links related to the project." Classes="dialog-description"/>
+                        </StackPanel>
+                        <StackPanel Margin="24,0,24,12" Spacing="12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                                <TextBlock Text="{Binding CountLabel}" Classes="dialog-label"/>
+                                <TextBlock Grid.Column="1" Text="Drag to reorder · Menu follows this order" Classes="dialog-label"
+                                           HorizontalAlignment="Right" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Border Classes="dialog-card" IsVisible="{Binding !Links.Count}">
+                                <TextBlock Text="No links yet. Select New Link to add one." Classes="dialog-description"/>
+                            </Border>
+                            <ItemsControl x:Name="LinkList" ItemsSource="{Binding Links}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ProjectLinkViewModel">
+                                        <Border Classes="dialog-card command-row" Margin="0,0,0,12">
+                                            <Grid ColumnDefinitions="24,*,Auto,Auto" ColumnSpacing="12">
+                                                <Border Classes="drag-grip" VerticalAlignment="Center" Width="24" Padding="0,8" CornerRadius="{StaticResource ControlRadius}"
+                                                        Cursor="SizeAll" Focusable="True" AutomationProperties.Name="Reorder link"
+                                                        ToolTip.Tip="Drag to reorder, or focus and press Alt+Up / Alt+Down."
+                                                        PointerPressed="OnGripPressed" PointerMoved="OnGripMoved" PointerReleased="OnGripReleased"
+                                                        PointerCaptureLost="OnGripCaptureLost" KeyDown="OnGripKeyDown">
+                                                    <Path Classes="utility-icon" HorizontalAlignment="Center" Data="M8,4 H8.01 M16,4 H16.01 M8,12 H8.01 M16,12 H16.01 M8,20 H8.01 M16,20 H16.01" StrokeThickness="3"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Spacing="8">
+                                                    <TextBox Classes="dialog-input" Text="{Binding Name}" PlaceholderText="Link name" AutomationProperties.Name="Link name"/>
+                                                    <TextBox Classes="dialog-input" Text="{Binding Url}" PlaceholderText="https://example.com" AutomationProperties.Name="Link URL"/>
+                                                    <TextBlock Text="{Binding Error}" Classes="dialog-error" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="2" Content="Open" Classes="dialog-action" Command="{Binding OpenCommand}"/>
+                                                <Button Grid.Column="3" Content="Delete" Classes="dialog-action dialog-danger" Click="OnRemoveLink"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+                <Border Grid.Row="1" Classes="dialog-footer">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding Error}" Classes="dialog-error" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button Content="Cancel" Classes="dialog-action" Command="{Binding CancelCommand}"/>
+                            <Button Content="Save changes" Classes="dialog-action dialog-primary" Command="{Binding ConfirmCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ThemeVariantScope>
+</UserControl>

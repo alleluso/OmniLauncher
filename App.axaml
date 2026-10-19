@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="OmniLauncher.App"
+             xmlns:local="using:OmniLauncher"
+             Name="OmniLauncher"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://OmniLauncher/Styles/DesignTokens.axaml"/>
+        <StyleInclude Source="avares://OmniLauncher/Styles/HubStyles.axaml"/>
+        <StyleInclude Source="avares://OmniLauncher/Styles/ScrollStyles.axaml"/>
+        <StyleInclude Source="avares://OmniLauncher/Styles/DialogStyles.axaml"/>
+        <StyleInclude Source="avares://OmniLauncher/Styles/LibraryStyles.axaml"/>
+    </Application.Styles>
+</Application>
+

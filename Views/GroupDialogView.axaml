@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OmniLauncher.ViewModels" xmlns:m="using:OmniLauncher.Models"
+             xmlns:conv="using:OmniLauncher.Converters" xmlns:svg="using:Avalonia.Svg.Skia"
+             x:Class="OmniLauncher.Views.GroupDialogView" x:DataType="vm:GroupDialogViewModel" Classes="dialog">
+    <ThemeVariantScope RequestedThemeVariant="Dark">
+        <Border Classes="dialog-shell" MaxWidth="580" MaxHeight="760" Margin="24"
+                VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Classes="dialog-heading">
+                    <TextBlock Text="{Binding Title}" Classes="dialog-title"/>
+                    <TextBlock Text="Manage a group of projects belonging to the same application and category." Classes="dialog-description"/>
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="24,0,24,24" Spacing="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Application" Classes="dialog-label"/>
+                            <ComboBox Classes="dialog-input" ItemsSource="{Binding ApplicationTypes}" SelectedItem="{Binding SelectedApplication}"
+                                      IsEnabled="{Binding CanEditClassification}" HorizontalAlignment="Stretch" AutomationProperties.Name="Group application">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <svg:Svg Path="{Binding Converter={x:Static conv:ProjectTypeToIconConverter.Instance}}" Width="20" Height="20" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Converter={x:Static conv:EnumToFriendlyStringConverter.Instance}}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Group name" Classes="dialog-label"/>
+                            <TextBox Classes="dialog-input" Text="{Binding GroupName}" PlaceholderText="My Group" AutomationProperties.Name="Group name"/>
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Category" Classes="dialog-label"/>
+                            <ComboBox x:Name="CategorySelector" Classes="dialog-input" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"
+                                      IsEnabled="{Binding CanEditClassification}" HorizontalAlignment="Stretch" AutomationProperties.Name="Group category">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="m:ProjectCategory">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Grid Width="20" VerticalAlignment="Center">
+                                                <TextBlock Text="○" FontSize="17" IsVisible="{Binding IsNone}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <Ellipse Fill="{Binding Color}" Width="12" Height="12" IsVisible="{Binding !IsNone}"
+                                                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Cover image (optional)" Classes="dialog-label"/>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <TextBox Classes="dialog-input" Text="{Binding ImagePath}" PlaceholderText="Select an image or leave empty…" AutomationProperties.Name="Group cover image"/>
+                                <Button Grid.Column="1" Classes="dialog-action" Content="Browse" Command="{Binding BrowseImageCommand}" CommandParameter="{Binding $parent[Window]}"/>
+                            </Grid>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Error}" Classes="dialog-error" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <Border Grid.Row="2" Classes="dialog-footer">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Content="Cancel" Classes="dialog-action" Command="{Binding CancelCommand}"/>
+                        <Button Content="{Binding ConfirmLabel}" Classes="dialog-action dialog-primary" Command="{Binding ConfirmCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </ThemeVariantScope>
+</UserControl>

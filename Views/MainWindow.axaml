@@ -1,0 +1,255 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:OmniLauncher.ViewModels" xmlns:m="using:OmniLauncher.Models"
+        xmlns:controls="using:OmniLauncher.Controls" xmlns:views="using:OmniLauncher.Views"
+        xmlns:converters="using:OmniLauncher.Converters" xmlns:svg="using:Avalonia.Svg.Skia"
+        x:Class="OmniLauncher.Views.MainWindow" x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app-logo.ico" Title="OmniLauncher" Background="{DynamicResource SurfaceBaseBrush}"
+        RequestedThemeVariant="Dark" Width="1400" Height="1000" MinWidth="1000" MinHeight="700"
+        Classes.list-view="{Binding IsListView}" Classes.group-view="{Binding IsGroupOpen}">
+    <Window.Resources>
+        <converters:ViewStateToVisibilityConverter x:Key="ViewStateToVisibilityConverter"/>
+        <DataTemplate x:Key="ProjectTileTemplate" x:DataType="x:Object">
+            <ContentControl Content="{Binding}" HorizontalContentAlignment="Stretch">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="m:ProjectItem" x:DataType="m:ProjectItem">
+                        <controls:ProjectTileItem Margin="0,0,0,8"
+                            TileSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TileSize}"/>
+                    </DataTemplate>
+                    <DataTemplate DataType="m:LibraryGroup" x:DataType="m:LibraryGroup">
+                        <controls:GroupCard TileSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TileSize}"/>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="ProjectListTemplate" x:DataType="x:Object">
+            <ContentControl Content="{Binding}" HorizontalContentAlignment="Stretch">
+                <ContentControl.DataTemplates>
+                    <DataTemplate DataType="m:ProjectItem" x:DataType="m:ProjectItem">
+                        <controls:ProjectListItem Margin="0,0,0,8"
+                            ListSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TileSize}"/>
+                    </DataTemplate>
+                    <DataTemplate DataType="m:LibraryGroup" x:DataType="m:LibraryGroup">
+                        <controls:GroupCard IsListView="True" TileSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TileSize}"/>
+                    </DataTemplate>
+                </ContentControl.DataTemplates>
+            </ContentControl>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.Styles>
+        <Style Selector="ItemsControl.project-collection">
+            <Setter Property="ItemTemplate" Value="{StaticResource ProjectTileTemplate}"/>
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate><StackPanel Classes="project-items"/></ItemsPanelTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Window.list-view ItemsControl.project-collection">
+            <Setter Property="ItemTemplate" Value="{StaticResource ProjectListTemplate}"/>
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ListColumns}"/>
+                </ItemsPanelTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Window.group-view:not(.list-view) ItemsControl.project-collection">
+            <Setter Property="ItemsPanel">
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" ItemSpacing="12" LineSpacing="4"/>
+                </ItemsPanelTemplate>
+            </Setter>
+        </Style>
+    </Window.Styles>
+    <Grid RowDefinitions="*,Auto" Background="{DynamicResource SurfaceBaseBrush}">
+        <Panel>
+            <Grid ColumnDefinitions="250,*" IsHitTestVisible="{Binding IsLibraryVisible}">
+
+                <!-- SideBar -->
+                <Border Background="{DynamicResource SurfaceSidebarBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,0,1,0">
+                    <Grid RowDefinitions="Auto,*,Auto" Margin="16,16,16,16">
+                        <StackPanel Margin="12,16,0,24" Spacing="4">
+                            <TextBlock Text="OmniLauncher" FontSize="19" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Your project library" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <ListBox Grid.Row="1" Classes="library-nav" ItemsSource="{Binding LibraryViews}"
+                                 SelectedItem="{Binding SelectedLibraryView}" VerticalAlignment="Top"
+                                 AutomationProperties.Name="Library view">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LibraryViewOption">
+                                    <Grid ColumnDefinitions="20,*" ColumnSpacing="12">
+                                        <TextBlock Text="{Binding Glyph}" IsVisible="{Binding !IsCategory}" FontSize="17"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Ellipse Fill="{Binding Category.Color}" IsVisible="{Binding IsCategory}"
+                                                 Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Button Content="Settings" Classes="dialog-action" HorizontalAlignment="Stretch"
+                                    Command="{Binding OpenSettingsCommand}"/>
+                            <Button Grid.Column="1" Classes="dialog-action" Width="38" Height="38" Padding="0"
+                                    Command="{Binding RefreshLibraryCommand}" ToolTip.Tip="Refresh library (F5)"
+                                    AutomationProperties.Name="Refresh library">
+                                <Path Width="18" Height="18" Stretch="Uniform" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                      StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                                      Data="M 20 7 A 9 9 0 0 0 5 5 L 2 8 M 2 2 L 2 8 L 8 8 M 4 17 A 9 9 0 0 0 19 19 L 22 16 M 16 16 L 22 16 L 22 22"/>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Header -->
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="24,24,24,24" RowSpacing="16">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                        <TextBlock Text="{Binding LibraryTitle}" Classes="dialog-title" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding LibraryTitle}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button Content="Add group" IsVisible="{Binding !IsGroupOpen}" Classes="dialog-action" Command="{Binding OpenAddGroupDialogCommand}"/>
+                            <Button Content="Back to library" IsVisible="{Binding IsGroupOpen}" Classes="dialog-action" Command="{Binding ExitGroupCommand}"/>
+                            <Button Content="Add project" Classes="dialog-action dialog-primary" Command="{Binding OpenAddDialogCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBox Grid.Row="1" x:Name="LibrarySearch" Classes="dialog-input" Text="{Binding SearchText}"
+                             PlaceholderText="{Binding SearchPlaceholder}" AutomationProperties.Name="Search library"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <WrapPanel Orientation="Horizontal">
+                            <ComboBox Classes="dialog-input" ItemsSource="{Binding ApplicationFilters}" SelectedItem="{Binding SelectedApplication}"
+                                      IsVisible="{Binding !IsGroupOpen}"
+                                      MinWidth="190" Margin="0,0,12,0" AutomationProperties.Name="Filter by application">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <svg:Svg Path="{Binding ., Converter={x:Static converters:ApplicationNameToIconConverter.Instance}}"
+                                                     Width="18" Height="18" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding .}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Sort by" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center"/>
+                                <ComboBox Classes="dialog-input" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}"
+                                          MinWidth="126" AutomationProperties.Name="Sort projects"/>
+                            </StackPanel>
+                        </WrapPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button Content="Clear filters" IsVisible="{Binding HasFilters}" Classes="dialog-action" Command="{Binding ClearFiltersCommand}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Library -->
+                    <Panel Grid.Row="3" Margin="0,8,0,0">
+                        <ScrollViewer x:Name="LibraryScroll" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding ProjectGroups}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="m:ProjectGroup">
+                                        <StackPanel Margin="0,0,0,24" Spacing="12">
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                                <Button Classes="application-heading" Click="OnApplicationHeadingClick" ToolTip.Tip="Open application"
+                                                        AutomationProperties.Name="{Binding GroupName}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <svg:Svg Path="{Binding ProjectType, Converter={x:Static converters:ProjectTypeToIconConverter.Instance}}"
+                                                                 Width="23" Height="23" VerticalAlignment="Center"/>
+                                                        <TextBlock Classes="application-heading-label" Text="{Binding GroupName}" FontSize="{StaticResource SectionTitleFontSize}" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <TextBlock Grid.Column="1" Text="{Binding Projects.Count}" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <ScrollViewer Classes="project-row" VerticalScrollBarVisibility="Disabled">
+                                                <ItemsControl Classes="project-collection" ItemsSource="{Binding Entries}">
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <Border Classes="dialog-card" IsVisible="{Binding ShowEmptyState}" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="460" Padding="32">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="{Binding EmptyTitle}" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding EmptyDescription}" Classes="dialog-description"/>
+                                <Button Content="{Binding EmptyActionLabel}" Classes="dialog-action dialog-primary" Command="{Binding EmptyActionCommand}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Panel>
+
+                    <!-- Footer -->
+                    <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                        <TextBlock Text="{Binding ResultCountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Notice}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
+                            <Border Classes="tile-size-control" Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="{StaticResource ControlRadius}" Padding="12,0">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <PathIcon Width="12" Height="12" Foreground="{DynamicResource TextSecondaryBrush}" ToolTip.Tip="Small entries"
+                                              Data="M0,0 H6 V6 H0 Z M10,0 H16 V6 H10 Z M0,10 H6 V16 H0 Z M10,10 H16 V16 H10 Z"/>
+                                    <Slider Classes="tile-size" Minimum="0" Maximum="2" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            SmallChange="1" LargeChange="1" Value="{Binding TileSize, Mode=TwoWay}" Width="110"
+                                            AutomationProperties.Name="Entry size" ToolTip.Tip="{Binding TileSizeLabel}"/>
+                                    <PathIcon Width="18" Height="18" Foreground="{DynamicResource TextSecondaryBrush}" ToolTip.Tip="Large entries"
+                                              Data="M0,0 H6 V6 H0 Z M10,0 H16 V6 H10 Z M0,10 H6 V16 H0 Z M10,10 H16 V16 H10 Z"/>
+                                </StackPanel>
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Button Classes="display-mode" Classes.selected="{Binding !IsListView}" Command="{Binding ShowTilesCommand}"
+                                        ToolTip.Tip="Tile view" AutomationProperties.Name="Tile view">
+                                    <PathIcon Width="16" Height="16" Data="M0,0 H6 V6 H0 Z M10,0 H16 V6 H10 Z M0,10 H6 V16 H0 Z M10,10 H16 V16 H10 Z"/>
+                                </Button>
+                                <Button Classes="display-mode" Classes.selected="{Binding IsListView}" Command="{Binding ShowListCommand}"
+                                        ToolTip.Tip="List view" AutomationProperties.Name="List view">
+                                    <PathIcon Width="16" Height="16" Data="M0,0 H3 V3 H0 Z M6,0 H16 V3 H6 Z M0,6 H3 V9 H0 Z M6,6 H16 V9 H6 Z M0,12 H3 V15 H0 Z M6,12 H16 V15 H6 Z"/>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Popups -->
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=GroupDialog}" Background="#90000000">
+                <views:GroupDialogView x:Name="GroupDialog" DataContext="{Binding GroupDialogViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=Settings}" Background="#90000000">
+                <views:SettingsView x:Name="SettingsDialog" DataContext="{Binding SettingsViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=AddProjectDialog}" Background="#90000000">
+                <views:AddProjectDialogView x:Name="AddDialog" DataContext="{Binding DialogViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=EditProjectDialog}" Background="#90000000">
+                <views:EditProjectDialogView x:Name="EditDialog" DataContext="{Binding EditDialogViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=ProjectCommandsDialog}" Background="#90000000">
+                <views:ProjectCommandsDialogView x:Name="CommandsDialog" DataContext="{Binding CommandsDialogViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=ProjectNotesDialog}" Background="#90000000">
+                <views:ProjectNotesDialogView x:Name="NotesDialog" DataContext="{Binding NotesDialogViewModel}"/>
+            </Panel>
+            <Panel IsVisible="{Binding ViewState, Converter={StaticResource ViewStateToVisibilityConverter}, ConverterParameter=DeleteProjectDialog}" Background="#90000000">
+                <views:DeleteConfirmationDialogView x:Name="RemoveDialog" DataContext="{Binding DeleteDialogViewModel}"/>
+            </Panel>
+        </Panel>
+
+        <!-- Error Message -->
+        <Border Grid.Row="1" IsVisible="{Binding HasError}" Background="{DynamicResource DangerSurfaceBrush}" Padding="16">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="{DynamicResource ErrorTextBrush}" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="Refresh" Classes="dialog-action" Command="{Binding RefreshLibraryCommand}"/>
+                <Button Grid.Column="2" Content="Dismiss" Classes="dialog-action" Command="{Binding DismissErrorCommand}"/>
+            </Grid>
+        </Border>
+        <!-- Block the whole window without applying disabled styles to its controls. -->
+        <Border x:Name="BusyOverlay" Grid.RowSpan="2" ZIndex="100"
+                IsVisible="{Binding IsWorking}" Background="#70000000"
+                Focusable="True" KeyboardNavigation.TabNavigation="None" Cursor="Wait"
+                AutomationProperties.Name="{Binding BusyMessage}">
+            <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="{StaticResource PanelRadius}"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24,24" MinWidth="280">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="{Binding BusyMessage}" Foreground="{DynamicResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center" FontSize="{StaticResource BodyFontSize}"/>
+                    <ProgressBar IsIndeterminate="True" Height="3" Width="224"
+                                 Foreground="{DynamicResource SystemControlHighlightAccentBrush}"/>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:m="using:OmniLauncher.Models" xmlns:conv="using:OmniLauncher.Converters"
+             x:Class="OmniLauncher.Controls.GroupCard" x:DataType="m:LibraryGroup" x:Name="GroupRoot"
+             HorizontalAlignment="Stretch">
+    <Grid>
+        <Grid x:Name="TileLayout" Classes="project-card" IsVisible="{Binding !IsListView, ElementName=GroupRoot}">
+            <Border CornerRadius="9" Background="#34343B" Margin="1" ClipToBounds="True">
+                <Grid x:Name="TileContent" RowDefinitions="174,*">
+                    <Button Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding Name}" AutomationProperties.Name="{Binding Name}">
+                        <Grid>
+                            <Border Background="#302D40"/>
+                            <PathIcon Width="46" Height="38" Opacity="0.45" Margin="0,0,0,24" Foreground="{DynamicResource TextPrimaryBrush}"
+                                      IsVisible="{Binding #CoverImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
+                                      Data="M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z"/>
+                            <Image x:Name="CoverImage" Source="{Binding ImagePath, Converter={x:Static conv:PathToImageConverter.Instance}}" Stretch="UniformToFill"/>
+                            <Border>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                        <GradientStop Offset="0" Color="#18000000"/>
+                                        <GradientStop Offset="0.45" Color="#10000000"/>
+                                        <GradientStop Offset="1" Color="#EF17171C"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+                    </Button>
+                    <Button Classes="tile-icon" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12" Click="OnMenu"
+                            ToolTip.Tip="Group actions" AutomationProperties.Name="Group actions">
+                        <PathIcon Width="18" Height="4" Data="M2,0 A2,2 0 1,0 2,4 A2,2 0 1,0 2,0 M9,0 A2,2 0 1,0 9,4 A2,2 0 1,0 9,0 M16,0 A2,2 0 1,0 16,4 A2,2 0 1,0 16,0"/>
+                    </Button>
+                    <Button Classes="project-open" VerticalAlignment="Bottom" Margin="16,0,16,12" Click="OnOpen" ToolTip.Tip="{Binding Name}">
+                        <StackPanel Spacing="4">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <PathIcon Width="16" Height="16" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"
+                                          Data="M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="{StaticResource ItemTitleFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                            <TextBlock x:Name="CompactCount" Text="{Binding CountLabel}" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                    </Button>
+                    <Grid x:Name="TileFooter" Grid.Row="1" Margin="16,12" RowDefinitions="Auto,*">
+                        <TextBlock Text="{Binding ApplicationName}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Row="1" Text="{Binding CountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Border Grid.RowSpan="2" Background="{Binding Category.Color}" IsVisible="{Binding HasCategory}" Height="9"
+                            VerticalAlignment="Bottom" ToolTip.Tip="{Binding Category.Name}"/>
+                </Grid>
+            </Border>
+            <Border Classes="project-outline" CornerRadius="{StaticResource PanelRadius}" BorderThickness="1" IsHitTestVisible="False"/>
+        </Grid>
+        <Grid x:Name="ListLayout" Classes="project-card" IsVisible="{Binding IsListView, ElementName=GroupRoot}" MinHeight="84">
+            <Border CornerRadius="9" Background="#34343B" Margin="1" ClipToBounds="True">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <Button Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding Name}" AutomationProperties.Name="{Binding Name}">
+                        <Grid>
+                            <Grid x:Name="ListCover" Width="220" Height="82" VerticalAlignment="Center" ClipToBounds="True" HorizontalAlignment="Left" IsHitTestVisible="False">
+                                <Grid.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Offset="0" Color="White"/>
+                                        <GradientStop Offset="0.45" Color="White"/>
+                                        <GradientStop Offset="1" Color="Transparent"/>
+                                    </LinearGradientBrush>
+                                </Grid.OpacityMask>
+                                <Border Background="#302D40"/>
+                                <PathIcon Width="46" Height="38" Opacity="0.65" Foreground="{DynamicResource TextPrimaryBrush}"
+                                          IsVisible="{Binding #ListImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
+                                          Data="M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z"/>
+                                <Image x:Name="ListImage" Source="{Binding #CoverImage.Source}" Stretch="UniformToFill"/>
+                            </Grid>
+                            <StackPanel x:Name="ListTitle" Margin="250,0,16,0" VerticalAlignment="Center" Spacing="4">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                    <PathIcon Width="16" Height="16" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"
+                                              Data="M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="{StaticResource ItemTitleFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                                <TextBlock Text="{Binding CountLabel}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="2" Classes="tile-icon" VerticalAlignment="Center" Margin="0,0,16,0" Click="OnMenu"
+                            ToolTip.Tip="Group actions" AutomationProperties.Name="Group actions">
+                        <PathIcon Width="18" Height="4" Data="M2,0 A2,2 0 1,0 2,4 A2,2 0 1,0 2,0 M9,0 A2,2 0 1,0 9,4 A2,2 0 1,0 9,0 M16,0 A2,2 0 1,0 16,4 A2,2 0 1,0 16,0"/>
+                    </Button>
+                    <Border Grid.ColumnSpan="3" Background="{Binding Category.Color}" IsVisible="{Binding HasCategory}" Width="9"
+                            HorizontalAlignment="Right" ToolTip.Tip="{Binding Category.Name}"/>
+                </Grid>
+            </Border>
+            <Border Classes="project-outline" CornerRadius="{StaticResource PanelRadius}" BorderThickness="1" IsHitTestVisible="False"/>
+        </Grid>
+    </Grid>
+</UserControl>

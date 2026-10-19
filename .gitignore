@@ -1,0 +1,23 @@
+# Build and publish output
+bin/
+obj/
+/publish/
+/publish-verify/
+/artifacts/
+
+# Local data and backups
+/.localappdata/
+*.user
+*.suo
+*.log
+
+# Local tooling and verification
+/Scripts/
+/Tests/
+/.vs/
+/.vscode/
+/.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,182 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:OmniLauncher.Converters">
+    <Styles.Resources>
+        <SolidColorBrush x:Key="LibraryAccentSubtleBrush" Color="{DynamicResource SystemAccentColor}" Opacity="0.2"/>
+        <ControlTheme x:Key="TileSizeThumb" TargetType="Thumb">
+            <Setter Property="Width" Value="14"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}" CornerRadius="{StaticResource ControlRadius}" BorderBrush="{DynamicResource BorderHoverBrush}" BorderThickness="2"/>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}"/>
+            </Style>
+        </ControlTheme>
+        <ControlTheme x:Key="TileSizeTrackFill" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid Background="Transparent">
+                        <Border Height="4" Background="{TemplateBinding Background}" CornerRadius="2" VerticalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+    </Styles.Resources>
+    <Style Selector="Button.git-text">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.git-text:pointerover /template/ ContentPresenter, Button.git-text:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.application-heading">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.application-heading TextBlock.application-heading-label">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="Button.application-heading:pointerover /template/ ContentPresenter, Button.application-heading:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.application-heading:pointerover TextBlock.application-heading-label, Button.application-heading:pressed TextBlock.application-heading-label">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="Border.tile-size-control:disabled">
+        <Setter Property="Opacity" Value="0.4"/>
+    </Style>
+    <Style Selector="Slider.tile-size">
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="SizeSliderFocus" CornerRadius="{StaticResource ControlRadius}" BorderThickness="1" BorderBrush="Transparent" Padding="4,0">
+                    <Grid Background="Transparent">
+                        <Border Height="4" CornerRadius="2" Background="#48454F" Margin="8,0" VerticalAlignment="Center"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="4,0" IsHitTestVisible="False">
+                            <Ellipse Width="4" Height="4" Fill="#918A9F" VerticalAlignment="Center"/>
+                            <Ellipse Grid.Column="1" Width="4" Height="4" Fill="#918A9F" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Ellipse Grid.Column="2" Width="4" Height="4" Fill="#918A9F" VerticalAlignment="Center"/>
+                        </Grid>
+                        <Track x:Name="PART_Track" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}" Orientation="Horizontal">
+                            <Track.DecreaseButton><RepeatButton x:Name="PART_DecreaseButton" Theme="{StaticResource TileSizeTrackFill}"/></Track.DecreaseButton>
+                            <Track.Thumb><Thumb Theme="{StaticResource TileSizeThumb}"/></Track.Thumb>
+                            <Track.IncreaseButton><RepeatButton x:Name="PART_IncreaseButton" Theme="{StaticResource TileSizeTrackFill}" Background="Transparent"/></Track.IncreaseButton>
+                        </Track>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="Slider.tile-size:focus-visible /template/ Border#SizeSliderFocus">
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="StackPanel.project-items">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Spacing" Value="12"/>
+    </Style>
+    <Style Selector="ScrollViewer.project-row">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+    </Style>
+    <Style Selector="Window.list-view StackPanel.project-items">
+        <Setter Property="Orientation" Value="Vertical"/>
+        <Setter Property="Spacing" Value="0"/>
+    </Style>
+    <Style Selector="Window.list-view ScrollViewer.project-row">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+    <Style Selector="Window.group-view ScrollViewer.project-row">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+    <Style Selector="Button.display-mode">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Background" Value="#29292F"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+    </Style>
+    <Style Selector="Button.display-mode.selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+        <Setter Property="Foreground" Value="{ReflectionBinding Background.Color, RelativeSource={RelativeSource Self}, Converter={x:Static conv:AccentContrastConverter.Instance}}"/>
+    </Style>
+    <Style Selector="Button.project-open">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.project-open:pointerover /template/ ContentPresenter, Button.project-open:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Border.project-outline">
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+    </Style>
+    <Style Selector="Grid.project-card:pointerover > Border.project-outline">
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}"/>
+    </Style>
+    <Style Selector="Button.tile-icon">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="MinWidth" Value="32"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="FontSize" Value="21"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.tile-icon.favorite">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="Path.favorite-star">
+        <Setter Property="Stroke" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="Fill" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.favorite Path.favorite-star">
+        <Setter Property="Stroke" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+        <Setter Property="Fill" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="Button.repair-action">
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontSize" Value="{StaticResource MetadataFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource WarningTextBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource WarningSurfaceBrush}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="ListBox.library-nav">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="ListBox.library-nav ListBoxItem">
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+    </Style>
+    <Style Selector="ListBox.library-nav ListBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LibraryAccentSubtleBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+</Styles>

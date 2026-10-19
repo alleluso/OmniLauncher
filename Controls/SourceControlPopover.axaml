@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:m="using:OmniLauncher.Models" x:Class="OmniLauncher.Controls.SourceControlPopover" x:DataType="m:ProjectItem">
+    <StackPanel Width="340" Spacing="16" Margin="0">
+        <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Source control" FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Text="{Binding GitStatus.Summary}" Foreground="{Binding GitColor}" FontSize="{StaticResource MetadataFontSize}"/>
+            </StackPanel>
+            <Border Grid.Column="1" Background="#303039" CornerRadius="{StaticResource ControlRadius}" Padding="8,4" VerticalAlignment="Top">
+                <TextBlock Text="GIT" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </Border>
+        </Grid>
+        <Border Classes="dialog-card" Padding="12" IsVisible="{Binding GitStatus.HasError}">
+            <TextBlock Text="{Binding GitStatus.Error}" Foreground="{DynamicResource ErrorTextBrush}" TextWrapping="Wrap" FontSize="{StaticResource MetadataFontSize}"/>
+        </Border>
+        <StackPanel Spacing="12" IsVisible="{Binding GitStatus.HasStatus}">
+            <Border Classes="dialog-card" Padding="12">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="BRANCH" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding GitStatus.Branch}" FontSize="{StaticResource BodyFontSize}" FontWeight="SemiBold" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Border Classes="dialog-card" Padding="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding GitStatus.Changes}" FontSize="{StaticResource PageTitleFontSize}" FontWeight="SemiBold" Foreground="{Binding GitColor}"/>
+                        <TextBlock Text="Changed files" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="dialog-card" Padding="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding GitStatus.Conflicts}" FontSize="{StaticResource PageTitleFontSize}" FontWeight="SemiBold" Foreground="{Binding GitColor}"/>
+                        <TextBlock Text="Conflicts" FontSize="{StaticResource MetadataFontSize}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <StackPanel Spacing="8">
+                <TextBlock Text="UPSTREAM" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding GitStatus.UpstreamLabel}" FontSize="{StaticResource MetadataFontSize}" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <Grid ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8" IsVisible="{Binding GitStatus.HasUpstream}">
+                    <TextBlock Text="↑ Outgoing" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding GitStatus.Ahead}" FontWeight="SemiBold" Margin="0,0,16,0"/>
+                    <TextBlock Grid.Column="2" Text="↓ Incoming" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+                    <TextBlock Grid.Column="3" Text="{Binding GitStatus.Behind}" FontWeight="SemiBold"/>
+                </Grid>
+                <TextBlock Text="Based on the last fetch" Foreground="#858592" FontSize="{StaticResource MetadataFontSize}" IsVisible="{Binding GitStatus.HasUpstream}"/>
+            </StackPanel>
+        </StackPanel>
+        <Border Height="1" Background="{DynamicResource BorderSubtleBrush}"/>
+        <StackPanel Spacing="4">
+            <TextBlock Text="REPOSITORY" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock Text="{Binding GitStatus.Repository}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource MetadataFontSize}"/>
+        </StackPanel>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Button x:Name="OpenButton" Classes="dialog-action dialog-primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnOpenClient"/>
+            <Button x:Name="RefreshButton" Grid.Column="1" Classes="dialog-action" Width="38" Padding="8" HorizontalContentAlignment="Center"
+                    ToolTip.Tip="Refresh status" AutomationProperties.Name="Refresh source control status" Click="OnRefresh">
+                <Path Width="16" Height="16" Stretch="Uniform" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1.7"
+                      Data="M 14,5 A 6,6 0 1,0 14,11 M 14,1 L 14,5 L 10,5"/>
+            </Button>
+        </Grid>
+    </StackPanel>
+</UserControl>

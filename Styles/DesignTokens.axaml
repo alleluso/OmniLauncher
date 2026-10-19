@@ -1,0 +1,41 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <!-- Neutral surfaces; accent denotes actions/selection, amber denotes attention. -->
+        <SolidColorBrush x:Key="SurfaceBaseBrush" Color="#1B1B1F"/>
+        <SolidColorBrush x:Key="SurfaceSidebarBrush" Color="#17171B"/>
+        <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#242429"/>
+        <SolidColorBrush x:Key="SurfaceControlBrush" Color="#2B2B32"/>
+        <SolidColorBrush x:Key="SurfaceHoverBrush" Color="#34343D"/>
+        <SolidColorBrush x:Key="SurfacePressedBrush" Color="#202026"/>
+        <SolidColorBrush x:Key="BorderSubtleBrush" Color="#393940"/>
+        <SolidColorBrush x:Key="BorderControlBrush" Color="#404049"/>
+        <SolidColorBrush x:Key="BorderHoverBrush" Color="#555560"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F1F1F5"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#AAAAB7"/>
+        <SolidColorBrush x:Key="WarningTextBrush" Color="#E9B95F"/>
+        <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#332C20"/>
+        <SolidColorBrush x:Key="DangerTextBrush" Color="#FF909B"/>
+        <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3D252D"/>
+        <SolidColorBrush x:Key="ErrorTextBrush" Color="#FFB4AB"/>
+        <CornerRadius x:Key="ControlRadius">6</CornerRadius>
+        <CornerRadius x:Key="PanelRadius">10</CornerRadius>
+        <x:Double x:Key="MetadataFontSize">12</x:Double>
+        <x:Double x:Key="BodyFontSize">14</x:Double>
+        <x:Double x:Key="ItemTitleFontSize">16</x:Double>
+        <x:Double x:Key="SectionTitleFontSize">18</x:Double>
+        <x:Double x:Key="PageTitleFontSize">24</x:Double>
+    </Styles.Resources>
+    <Style Selector="Window">
+        <Setter Property="FontSize" Value="{StaticResource BodyFontSize}"/>
+    </Style>
+    <!-- All utility icons use a single monochrome outline treatment. -->
+    <Style Selector="Path.utility-icon">
+        <Setter Property="Width" Value="18"/>
+        <Setter Property="Height" Value="18"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="StrokeLineCap" Value="Round"/>
+        <Setter Property="StrokeJoin" Value="Round"/>
+    </Style>
+</Styles>

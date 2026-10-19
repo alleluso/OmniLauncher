@@ -1,0 +1,171 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:OmniLauncher.Converters">
+    <!-- Shared by settings, project dialogs and the source-control popover. -->
+    <Style Selector="Border.command-row.drop-target">
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="Border.command-row.drag-source">
+        <Setter Property="Opacity" Value="0.45"/>
+    </Style>
+    <Style Selector="Border.drag-grip:pointerover, Border.drag-grip:focus-visible">
+        <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+    </Style>
+    <Style Selector="FlyoutPresenter.source-control-flyout">
+        <Setter Property="Cursor" Value="Arrow"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource PanelRadius}"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+    <Style Selector="Border.dialog-shell">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource PanelRadius}"/>
+    </Style>
+    <Style Selector="StackPanel.dialog-heading">
+        <Setter Property="Margin" Value="24,24,24,24"/>
+        <Setter Property="Spacing" Value="8"/>
+    </Style>
+    <Style Selector="TextBlock.dialog-title">
+        <Setter Property="FontSize" Value="{StaticResource PageTitleFontSize}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="TextBlock.dialog-description">
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="TextBlock.dialog-label">
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource MetadataFontSize}"/>
+    </Style>
+    <Style Selector="TextBlock.dialog-error">
+        <Setter Property="Foreground" Value="{DynamicResource ErrorTextBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="Border.dialog-card, Expander.dialog-card">
+        <Setter Property="Border.Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+        <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+        <Setter Property="Border.BorderThickness" Value="1"/>
+        <Setter Property="Border.CornerRadius" Value="{StaticResource PanelRadius}"/>
+        <Setter Property="Border.Padding" Value="16"/>
+    </Style>
+    <Style Selector="Expander.dialog-card /template/ ToggleButton#ExpanderHeader">
+        <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}}"/>
+    </Style>
+    <Style Selector="Border.dialog-footer">
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="24,16"/>
+    </Style>
+    <Style Selector="Button.dialog-action, Button.tile-icon">
+        <Setter Property="Background" Value="{DynamicResource SurfaceControlBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.dialog-action:pointerover /template/ ContentPresenter, Button.tile-icon:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="Button.dialog-action:pressed /template/ ContentPresenter, Button.tile-icon:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource SurfacePressedBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="Button.dialog-primary">
+        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.dialog-primary:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.dialog-primary:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPressed}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.dialog-primary /template/ ContentPresenter, Button.dialog-primary:pointerover /template/ ContentPresenter, Button.dialog-primary:pressed /template/ ContentPresenter">
+        <Setter Property="Foreground" Value="{ReflectionBinding Background.Color, RelativeSource={RelativeSource Self}, Converter={x:Static conv:AccentContrastConverter.Instance}}"/>
+    </Style>
+    <Style Selector="Button.dialog-danger">
+        <Setter Property="Background" Value="{DynamicResource DangerSurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.dialog-danger:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#582C38"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#FFBAC1"/>
+    </Style>
+    <Style Selector="Button.dialog-danger:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="#48232D"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#FFBAC1"/>
+    </Style>
+    <Style Selector="TextBox.dialog-input, ComboBox.dialog-input">
+        <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="38"/>
+    </Style>
+    <Style Selector="TextBox.dialog-input">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TextBox.project-notes">
+        <Setter Property="FontSize" Value="{StaticResource ItemTitleFontSize}"/>
+        <Setter Property="LineHeight" Value="24"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="TextBox.project-notes:pointerover, TextBox.project-notes:focus">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <!-- Fluent paints the focused background on the template border, not the TextBox. -->
+    <Style Selector="TextBox.project-notes:pointerover /template/ Border#PART_BorderElement, TextBox.project-notes:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style Selector="TextBox.project-notes:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}"/>
+    </Style>
+    <Style Selector="TextBox.project-notes /template/ TextBlock#PART_Placeholder">
+        <Setter Property="LineHeight" Value="24"/>
+    </Style>
+    <Style Selector="Border.shortcut-recorder">
+        <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="MinHeight" Value="38"/>
+    </Style>
+    <Style Selector="TextBlock.shortcut-value">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.shortcut-value.recording">
+        <Setter Property="Foreground" Value="#FFED86"/>
+    </Style>
+    <Style Selector="ComboBox.dialog-input">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+</Styles>
+

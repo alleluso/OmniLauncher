@@ -1,0 +1,45 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:text="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia">
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CTextBlock">
+        <Setter Property="FontSize" Value="{StaticResource ItemTitleFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading1">
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading2">
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading3, .Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading4, .Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading5, .Markdown_Avalonia_MarkdownViewer text|CTextBlock.Heading6">
+        <Setter Property="FontSize" Value="{StaticResource SectionTitleFontSize}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CHyperlink">
+        <Setter Property="Foreground" Value="#A9BFFF"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CHyperlink:pointerover">
+        <Setter Property="Foreground" Value="#D4DFFF"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer text|CCode">
+        <Setter Property="Foreground" Value="#E9D5A5"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.CodeBlock">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBaseBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource ControlRadius}"/>
+        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Margin" Value="0,8"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource BodyFontSize}"/>
+    </Style>
+    <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.List">
+        <Setter Property="Margin" Value="24,0,0,0"/>
+    </Style>
+</Styles>
