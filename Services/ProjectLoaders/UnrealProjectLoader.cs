@@ -20,6 +20,9 @@ public class UnrealProjectLoader : IProjectTypeLoader
     public string? FilePickerTitle => null;
     public IReadOnlyList<string> ProjectFilePatterns => [];
 
+    public ProjectItem CreateUnavailable(string name, string path) =>
+        new UnrealProject { Name = name, ProjectPath = path, EngineVersion = "Unknown", UprojectFilePath = "Unknown" };
+
     public async Task<ProjectItem> LoadProjectAsync(string name, string path, bool loadFallbackImage)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));

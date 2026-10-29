@@ -13,7 +13,7 @@
                             <PathIcon Width="46" Height="38" Opacity="0.45" Margin="0,0,0,24" Foreground="{DynamicResource TextPrimaryBrush}"
                                       IsVisible="{Binding #CoverImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
                                       Data="M2,4 L9,4 L12,7 L22,7 L22,20 L2,20 Z"/>
-                            <Image x:Name="CoverImage" Source="{Binding ImagePath, Converter={x:Static conv:PathToImageConverter.Instance}}" Stretch="UniformToFill"/>
+                            <Image x:Name="CoverImage" conv:AsyncImage.Path="{Binding ImagePath}" Stretch="UniformToFill"/>
                             <Border>
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">

@@ -25,6 +25,9 @@ public class BlenderProjectLoader : IProjectTypeLoader
     public string? FilePickerTitle => "Select the .blend file";
     public IReadOnlyList<string> ProjectFilePatterns => ["*.blend"];
 
+    public ProjectItem CreateUnavailable(string name, string path) =>
+        new BlenderProject { Name = name, ProjectPath = path, BlenderVersion = "Unknown" };
+
     public async Task<ProjectItem> LoadProjectAsync(string name, string path, bool loadFallbackImage)
     {
         var project = new BlenderProject { Name = name, ProjectPath = path, BlenderVersion = "Unknown" };
@@ -33,7 +36,7 @@ public class BlenderProjectLoader : IProjectTypeLoader
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             
             // Decompression and thumbnail conversion never run on the UI thread.
-            var info = await Task.Run(() => ReadFileAsync(path, loadFallbackImage, null, timeout.Token));
+            var info = await Task.Run(() => ReadFileAsync(path, loadFallbackImage, null, timeout.Token)).WaitAsync(timeout.Token);
             project.BlenderVersion = info.Version;
             project.FallbackImagePath = info.PreviewPath;
         }

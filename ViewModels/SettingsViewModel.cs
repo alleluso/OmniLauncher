@@ -76,14 +76,30 @@ public partial class RegisteredApplicationViewModel : ViewModelBase
     public ProjectType Type { get; }
     public string Name => ApplicationRegistry.Get(Type).Name;
     public string IconPath => ApplicationRegistry.Get(Type).IconPath;
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsMissing))]
-    private string _path;
+    [ObservableProperty] private string _path;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VersionLabel))]
     private string _version;
     [ObservableProperty] private string _error = "";
-    public bool IsMissing => !File.Exists(Path);
+    // Checked in the background: the executable may be on an offline drive.
+    [ObservableProperty] private bool _isMissing;
+    private int _checkVersion;
+
+    partial void OnPathChanged(string value) => _ = CheckAsync(inferVersion: false);
+
+    /// <summary>Checks the executable off the UI thread; optionally re-reads its installed version.</summary>
+    public async Task CheckAsync(bool inferVersion)
+    {
+        var check = ++_checkVersion;
+        var path = Path;
+        var type = Type;
+        var (exists, version) = await PathProbe.RunAsync(path,
+            p => File.Exists(p) ? (true, inferVersion ? ApplicationPaths.InferVersion(type, p) : "") : (false, ""),
+            (false, ""));
+        if (check != _checkVersion) return;
+        IsMissing = !exists;
+        if (inferVersion && exists) Version = version;
+    }
     public string VersionLabel => string.IsNullOrWhiteSpace(Version) ? "Version unavailable" : Version;
 
     public RegisteredApplicationViewModel(SettingsViewModel owner, RegisteredApplication application)
@@ -92,6 +108,7 @@ public partial class RegisteredApplicationViewModel : ViewModelBase
         Type = application.Type;
         _path = application.Path;
         _version = application.Version;
+        _ = CheckAsync(inferVersion: true);
     }
 
     [RelayCommand] private void Remove() => _owner.Applications.Remove(this);
@@ -259,9 +276,8 @@ public partial class SettingsViewModel : ViewModelBase
         Applications.Clear();
         foreach (var application in ProjectLoaderService.ReadApplications(root))
         {
-            // Read installed metadata again without executing the selected application.
-            var version = File.Exists(application.Path) ? ApplicationPaths.InferVersion(application.Type, application.Path) : application.Version;
-            Applications.Add(new(this, application with { Version = version }));
+            // Installed metadata is re-read in the background by the row (never executes the application).
+            Applications.Add(new(this, application));
         }
     }
 }

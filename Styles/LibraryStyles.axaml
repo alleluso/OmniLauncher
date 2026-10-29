@@ -133,6 +133,17 @@
     <Style Selector="Grid.project-card:pointerover > Border.project-outline">
         <Setter Property="BorderBrush" Value="{DynamicResource BorderHoverBrush}"/>
     </Style>
+    <!-- Unavailable project or application: dark-yellow outline, warm tint, dimmed cover. -->
+    <Style Selector="Grid.project-card.unavailable > Border.project-outline">
+        <Setter Property="BorderBrush" Value="{DynamicResource UnavailableBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource UnavailableTintBrush}"/>
+    </Style>
+    <Style Selector="Grid.project-card.unavailable:pointerover > Border.project-outline">
+        <Setter Property="BorderBrush" Value="{DynamicResource UnavailableBorderHoverBrush}"/>
+    </Style>
+    <Style Selector="Grid.project-card.unavailable Image">
+        <Setter Property="Opacity" Value="0.4"/>
+    </Style>
     <Style Selector="Button.tile-icon">
         <Setter Property="Width" Value="32"/>
         <Setter Property="Height" Value="32"/>

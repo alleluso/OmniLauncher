@@ -14,6 +14,10 @@
         <SolidColorBrush x:Key="TextSecondaryBrush" Color="#AAAAB7"/>
         <SolidColorBrush x:Key="WarningTextBrush" Color="#E9B95F"/>
         <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#332C20"/>
+        <!-- Dark yellow: entries whose project or application path is unavailable. -->
+        <SolidColorBrush x:Key="UnavailableBorderBrush" Color="#9A7A1E"/>
+        <SolidColorBrush x:Key="UnavailableBorderHoverBrush" Color="#C49A26"/>
+        <SolidColorBrush x:Key="UnavailableTintBrush" Color="#9A7A1E" Opacity="0.14"/>
         <SolidColorBrush x:Key="DangerTextBrush" Color="#FF909B"/>
         <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#3D252D"/>
         <SolidColorBrush x:Key="ErrorTextBrush" Color="#FFB4AB"/>

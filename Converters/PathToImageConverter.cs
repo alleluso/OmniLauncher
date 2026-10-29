@@ -1,16 +1,13 @@
 using System;
 using System.Globalization;
-using System.IO;
 using Avalonia.Data.Converters;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 
 namespace OmniLauncher.Converters;
 
 /// <summary>
-/// Converts a string image path to an <see cref="Avalonia.Media.IImage"/>.
-/// Supports absolute file-system paths and avares:// URIs.
-/// Returns null (transparent) when the path is empty or the file cannot be loaded.
+/// Converts an image path to an already-loaded bitmap without touching the disk.
+/// Prefer <see cref="AsyncImage"/>: this converter only returns images that are already cached
+/// and starts a background load otherwise, so it can never block the UI thread.
 /// </summary>
 public class PathToImageConverter : IValueConverter
 {
@@ -18,26 +15,9 @@ public class PathToImageConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not string path || string.IsNullOrWhiteSpace(path))
-            return null;
-
-        try
-        {
-            if (path.StartsWith("avares://", StringComparison.OrdinalIgnoreCase))
-            {
-                using var stream = AssetLoader.Open(new Uri(path));
-                return new Bitmap(stream);
-            }
-
-            if (File.Exists(path))
-                return new Bitmap(path);
-        }
-        catch
-        {
-            // Fall through to return null — the tile's solid-colour fallback will show instead.
-        }
-
-        return null;
+        if (value is not string path || string.IsNullOrWhiteSpace(path)) return null;
+        var load = AsyncImage.LoadAsync(path);
+        return load.IsCompletedSuccessfully ? load.Result : null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,7 +49,11 @@ public partial class MainWindow : Window
         AddHandler(PointerWheelChangedEvent, BlockBusyInput, RoutingStrategies.Tunnel);
         AddHandler(PointerWheelChangedEvent, OnProjectRowWheelChanged, RoutingStrategies.Tunnel);
         Closing += OnClosing;
-        Activated += async (_, _) => { if (_viewModel is not null) await _viewModel.RefreshGitStatusAsync(); };
+        Activated += async (_, _) =>
+        {
+            if (_viewModel is null) return;
+            await Task.WhenAll(_viewModel.RefreshAvailabilityAsync(), _viewModel.RefreshGitStatusAsync());
+        };
         Closed += (_, _) => { DetachViewModel(); (DataContext as IDisposable)?.Dispose(); };
     }
 

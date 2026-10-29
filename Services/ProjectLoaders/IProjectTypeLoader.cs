@@ -22,5 +22,9 @@ public interface IProjectTypeLoader
     /// are owned by the library service, not the loader.
     /// </summary>
     Task<ProjectItem> LoadProjectAsync(string name, string path, bool loadFallbackImage);
+
+    /// <summary>Item shown when metadata could not be read in time (e.g. an offline network drive).</summary>
+    ProjectItem CreateUnavailable(string name, string path) =>
+        new() { Name = name, ProjectPath = path, ApplicationType = ProjectType };
 }
 

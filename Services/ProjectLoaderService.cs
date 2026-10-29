@@ -44,11 +44,25 @@ public static class ProjectLoaderService
         {
             var items = new List<ProjectItem>();
             if (root["projects"]![loader.JsonKey] is not JsonArray entries) continue;
-            foreach (var entry in entries)
+            // Read every project concurrently on the thread pool. Windows file calls on an offline
+            // network/removable drive block for a long time and ignore cancellation tokens, so each
+            // read gets a hard deadline; unreachable projects still appear and can be repaired.
+            var loads = entries.Select(entry =>
             {
+                var name = entry!["name"]!.GetValue<string>();
+                var path = entry["path"]!.GetValue<string>();
+                var noImage = string.IsNullOrWhiteSpace(entry["image"]?.GetValue<string>());
+                return LoadWithDeadlineAsync(loader, name, path, noImage);
+            }).ToArray();
+            var loaded = await Task.WhenAll(loads);
+            var candidates = applications.Where(i => i.Type == loader.ProjectType).ToArray();
+            var found = await Task.WhenAll(candidates.Select(i => PathProbe.FileExistsAsync(i.Path)));
+            var executables = candidates.Select((application, i) => (Application: application, Exists: found[i])).ToArray();
+            for (var index = 0; index < entries.Count; index++)
+            {
+                var entry = entries[index];
                 var customImagePath = entry!["image"]?.GetValue<string>() ?? "";
-                var item = await loader.LoadProjectAsync(entry!["name"]!.GetValue<string>(),
-                    entry["path"]!.GetValue<string>(), string.IsNullOrWhiteSpace(customImagePath));
+                var item = loaded[index];
                 item.CustomImagePath = customImagePath;
                 item.Id = entry["id"]!.GetValue<string>();
                 item.GroupId = entry["groupId"]?.GetValue<string>();
@@ -66,15 +80,33 @@ public static class ProjectLoaderService
                 var definition = ApplicationRegistry.Get(loader.ProjectType);
                 item.ExecutablePath = !string.IsNullOrWhiteSpace(item.ExecutableOverride)
                     ? item.ExecutableOverride
-                    : applications.FirstOrDefault(i => i.Type == loader.ProjectType &&
-                        definition.MatchesVersion(i.Version, item.RequiredVersion) && File.Exists(i.Path))?.Path ?? "";
+                    : executables.FirstOrDefault(i => i.Exists &&
+                        definition.MatchesVersion(i.Application.Version, item.RequiredVersion)).Application?.Path ?? "";
                 items.Add(item);
             }
+            // Every project and executable path is checked in the background before the items reach the UI.
+            await Task.WhenAll(items.Select(item => item.RefreshAvailabilityAsync()));
             if (items.Count > 0)
                 groups.Add(new ProjectGroup { GroupName = loader.GroupName, ProjectType = loader.ProjectType, Projects = new(items) });
         }
         return groups;
     }
+
+    private static readonly TimeSpan ProjectTimeout = TimeSpan.FromSeconds(6);
+
+    private static async Task<ProjectItem> LoadWithDeadlineAsync(IProjectTypeLoader loader, string name, string path, bool loadFallbackImage)
+    {
+        try
+        {
+            return await Task.Run(() => loader.LoadProjectAsync(name, path, loadFallbackImage)).WaitAsync(ProjectTimeout);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Project '{name}' unavailable: {ex.Message}");
+            return loader.CreateUnavailable(name, path);
+        }
+    }
+
 
     public static Task AddProjectAsync(ProjectType type, string name, string path, string image, int categoryId = 0, string? groupId = null)
     {

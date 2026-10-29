@@ -100,23 +100,46 @@ public class ProjectItem : INotifyPropertyChanged
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
     public IReadOnlyList<ProjectLink> Links { get; set; } = Array.Empty<ProjectLink>();
     public virtual string RequiredVersion { get; set; } = string.Empty;
-    public bool HasExecutable => File.Exists(ExecutablePath);
+    // Availability is checked in the background (RefreshAvailabilityAsync) and stored, because
+    // bindings read these on the UI thread and the paths may live on an offline drive.
+    private bool _isProjectAvailable = true;
+    private bool _hasExecutable = true;
+    public bool HasExecutable
+    {
+        get => _hasExecutable;
+        private set { if (_hasExecutable == value) return; _hasExecutable = value; RaiseAvailabilityChanged(); }
+    }
     public bool IsProjectAvailable
     {
-        get
-        {
-            try { return ApplicationRegistry.Get(ApplicationType).IsProjectValid(ProjectPath); }
-            catch (Exception) { return false; }
-        }
+        get => _isProjectAvailable;
+        private set { if (_isProjectAvailable == value) return; _isProjectAvailable = value; RaiseAvailabilityChanged(); }
+    }
+
+    /// <summary>Re-checks the project and its application without blocking the calling thread.</summary>
+    public async System.Threading.Tasks.Task RefreshAvailabilityAsync()
+    {
+        var definition = ApplicationRegistry.Get(ApplicationType);
+        var project = PathProbe.RunAsync(ProjectPath, path => definition.IsProjectValid(path), false);
+        var executable = PathProbe.FileExistsAsync(ExecutablePath);
+        await System.Threading.Tasks.Task.WhenAll(project, executable);
+        IsProjectAvailable = project.Result;
+        HasExecutable = executable.Result;
+    }
+
+    private void RaiseAvailabilityChanged()
+    {
+        foreach (var name in new[] { nameof(IsProjectAvailable), nameof(HasExecutable), nameof(CanLaunch), nameof(NeedsRepair),
+                     nameof(RepairLabel), nameof(AvailabilityLabel), nameof(LaunchStatus) })
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
     public bool CanLaunch => IsProjectAvailable && HasExecutable;
     public bool NeedsRepair => !CanLaunch;
     public string RepairLabel => !IsProjectAvailable ? "Locate project" : "Choose application";
-    public string AvailabilityLabel => !IsProjectAvailable ? "Project missing or invalid" : !HasExecutable ? "Application unavailable" : "";
+    public string AvailabilityLabel => !IsProjectAvailable ? "Project unavailable" : !HasExecutable ? "Application unavailable" : "";
     public string LaunchStatus => !IsProjectAvailable
-        ? "Project missing or invalid. Use Edit Project to repair its path."
+        ? "Project missing, invalid, or on a drive that is offline. Reconnect the drive or use Edit Project to repair its path."
         : !HasExecutable
-        ? "Application missing. Open Settings to register an application, or Edit Project to choose an override."
+        ? "Application missing or on a drive that is offline. Reconnect the drive, open Settings to register an application, or Edit Project to choose an override."
         : string.IsNullOrWhiteSpace(ExecutableOverride) ? "Open with " + ExecutablePath : "Open with override: " + ExecutablePath;
     public virtual string ApplicationName => ApplicationRegistry.Get(ApplicationType).Name;
 

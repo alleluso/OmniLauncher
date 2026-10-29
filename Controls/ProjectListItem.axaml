@@ -5,7 +5,7 @@
              xmlns:svg="using:Avalonia.Svg.Skia"
              x:Class="OmniLauncher.Controls.ProjectListItem" x:DataType="m:ProjectItem"
              HorizontalAlignment="Stretch" MinHeight="84">
-    <Grid Classes="project-card">
+    <Grid Classes="project-card" Classes.unavailable="{Binding NeedsRepair}">
         <Border CornerRadius="9" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" ClipToBounds="True">
             <Grid x:Name="ListLayout" ColumnDefinitions="*,Auto,Auto">
                 <Button x:Name="OpenButton" Classes="project-open" Click="OnOpen" ToolTip.Tip="{Binding LaunchStatus}" AutomationProperties.Name="{Binding Name}">
@@ -22,7 +22,7 @@
                             <svg:Svg Path="{Binding ApplicationType, Converter={x:Static conv:ProjectTypeToIconConverter.Instance}}"
                                      IsVisible="{Binding #ListCoverImage.Source, Converter={x:Static ObjectConverters.IsNull}}"
                                      Width="46" Height="46" Opacity="0.65"/>
-                            <Image x:Name="ListCoverImage" Source="{Binding DisplayImagePath, Converter={x:Static conv:PathToImageConverter.Instance}}" Stretch="UniformToFill"/>
+                            <Image x:Name="ListCoverImage" conv:AsyncImage.Path="{Binding DisplayImagePath}" Stretch="UniformToFill"/>
                         </Grid>
                         <StackPanel x:Name="TitlePanel" Margin="250,0,16,0" VerticalAlignment="Center" Spacing="4">
                             <TextBlock Text="{Binding Name}" FontSize="{StaticResource ItemTitleFontSize}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"

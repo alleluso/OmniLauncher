@@ -18,7 +18,7 @@ public static class ProjectBatchLauncher
         var opened = new List<(ProjectItem Project, DateTimeOffset At)>();
         foreach (var project in selected)
         {
-            try { project.Launch(); opened.Add((project, DateTimeOffset.UtcNow)); }
+            try { await Task.Run(project.Launch); opened.Add((project, DateTimeOffset.UtcNow)); }
             catch (Exception ex) { errors.Add($"{project.Name}: {ex.Message}"); }
         }
         foreach (var (project, at) in opened)

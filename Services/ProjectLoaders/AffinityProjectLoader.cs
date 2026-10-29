@@ -39,7 +39,7 @@ public sealed class AffinityProjectLoader : IProjectTypeLoader
             try
             {
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                project.FallbackImagePath = await Task.Run(() => CachePreview(path, null, timeout.Token));
+                project.FallbackImagePath = await Task.Run(() => CachePreview(path, null, timeout.Token)).WaitAsync(timeout.Token);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or OperationCanceledException)
             {

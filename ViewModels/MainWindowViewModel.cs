@@ -381,7 +381,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         ErrorMessage = "";
         try
         {
-            project.Launch();
+            // Launching validates and starts files that may sit on a slow drive; keep it off the UI thread.
+            await Task.Run(project.Launch);
             var openedAt = DateTimeOffset.UtcNow;
             try
             {
@@ -440,14 +441,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         DeleteDialogViewModel.LoadProject(project);
         ViewState = ViewState.DeleteProjectDialog;
     }
+    /// <summary>Re-checks every project and application path (e.g. after a drive is reconnected).</summary>
+    public async Task RefreshAvailabilityAsync()
+    {
+        if (_disposed || !_hasLoaded) return;
+        try { await Task.WhenAll(AllProjects.Select(project => project.RefreshAvailabilityAsync())); }
+        catch (Exception ex) { ReportActionError("Could not check project availability", ex); }
+    }
+
     [RelayCommand] private void ShowInExplorer(ProjectItem? project)
     {
         if (project is null) return;
         try
         {
             var path = Path.GetFullPath(project.ProjectPath);
-            if (!File.Exists(path) && !Directory.Exists(path))
-                throw new IOException("This project path no longer exists. Use Edit Project to locate it.");
+            if (!project.IsProjectAvailable)
+                throw new IOException("This project path is missing or its drive is offline. Use Edit Project to locate it.");
             ProcessStartInfo start;
             if (OperatingSystem.IsWindows())
             {
@@ -479,6 +488,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             var root = await ProjectLoaderService.ReadLibraryAsync();
             if (_disposed || (onlyIfChanged && JsonNode.DeepEquals(root, _librarySnapshot))) return;
             if (!_hasLoaded) RestoreDisplayPreferences(root);
+            if (!onlyIfChanged) OmniLauncher.Converters.AsyncImage.ClearCache();
             IsLoading = true;
             if (!IsBusy) BusyMessage = "Loading library…";
             var groups = await ProjectLoaderService.LoadProjectGroupsAsync(root);

@@ -34,12 +34,18 @@ public partial class MainWindowViewModel
                 GitStatus? status = null;
                 if (settings.Enabled)
                 {
-                    var key = await Task.Run(() => GitService.FindRepository(project.ProjectPath) ?? project.ProjectPath, cts.Token);
-                    if (!cache.TryGetValue(key, out status))
+                    try
                     {
-                        status = await GitService.ReadAsync(project.ProjectPath, settings, cts.Token);
-                        cache[key] = status;
+                        // An offline drive must not stall the UI or the other projects' status.
+                        var key = await Task.Run(() => GitService.FindRepository(project.ProjectPath) ?? project.ProjectPath)
+                            .WaitAsync(TimeSpan.FromSeconds(3), cts.Token);
+                        if (!cache.TryGetValue(key, out status))
+                        {
+                            status = await Task.Run(() => GitService.ReadAsync(project.ProjectPath, settings, cts.Token), cts.Token);
+                            cache[key] = status;
+                        }
                     }
+                    catch (TimeoutException) { status = null; }
                 }
                 if (!_disposed && !cts.IsCancellationRequested) project.GitStatus = status;
             }
